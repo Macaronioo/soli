@@ -1082,6 +1082,7 @@ function touchStart(e){
     };
 
     el.style.zIndex = 9999;
+    el.style.pointerEvents = 'none';
 
     document.addEventListener(
         'touchmove',
@@ -1105,15 +1106,14 @@ function touchMove(e){
 
     const el = touchData.element;
 
-    el.style.left =
-        `${touch.clientX - 40}px`;
-
-    el.style.top =
-        `${touch.clientY - 60}px`;
+    el.style.transform =
+    `translate(
+    ${touch.clientX - 40}px,
+    ${touch.clientY - 60}px
+    )`;
 
     el.style.position = 'fixed';
 
-    el.style.pointerEvents = 'none';
 }
 
 function touchEnd(e){
@@ -1165,9 +1165,9 @@ function touchEnd(e){
     }
 
     touchData.element.style.position='';
-    touchData.element.style.left='';
-    touchData.element.style.top='';
+    touchData.element.style.transform='';
     touchData.element.style.zIndex='';
+    touchData.element.style.pointerEvents='';
 
     touchData = null;
 
