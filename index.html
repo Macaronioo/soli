@@ -111,16 +111,17 @@ button:hover{
 
 .tableau{
     display:flex;
-    gap:14px;
+    gap:8px;
     align-items:flex-start;
-    overflow-x:auto;
+    overflow-x:hidden;
     padding-bottom:20px;
-    min-width:0;
+
+    width:100%;
 }
 
 .column{
     min-height:60vh;
-    min-width:var(--card-w);
+    width: calc((420px - 20px) / 7);
     flex-shrink:0;
 }
 
@@ -1105,10 +1106,13 @@ function touchStart(e){
         offsetY: e.touches[0].clientY - rect.top
     };
 
-    el.style.zIndex = 9999;
-    el.style.pointerEvents = 'none';
-    el.style.transition = 'none';
-    el.style.willChange = 'transform';
+        el.style.zIndex = 9999;
+        el.style.pointerEvents = 'none';
+        el.style.transition = 'none';
+
+        const rect = el.getBoundingClientRect();
+        el.dataset.startLeft = rect.left;
+        el.dataset.startTop = rect.top;
 
     document.addEventListener(
         'touchmove',
@@ -1139,8 +1143,6 @@ function touchMove(e){
     el.style.top = '0px';
 
     el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-    el.style.transition = "none";
-
     el.style.willChange = 'transform';
 }
 
