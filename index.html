@@ -1161,7 +1161,7 @@ function touchEnd(e){
 
     // foundation
     const foundation =
-        target?.closest('.foundation');
+    target && target.closest('.foundation');
 
     if(foundation){
 
@@ -1175,7 +1175,7 @@ function touchEnd(e){
 
     // tableau
     const column =
-        target?.closest('.column');
+    target && target.closest('.column');
 
     if(column){
 
