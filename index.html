@@ -103,12 +103,17 @@ button:hover{
 
 .tableau{
     display:flex;
-    gap:var(--gap);
+    gap:14px;
     align-items:flex-start;
+    overflow-x:auto;
+    padding-bottom:20px;
+    min-width:max-content;
 }
 
 .column{
     min-height:60vh;
+    min-width:var(--card-w);
+    flex-shrink:0;
 }
 
 .card{
@@ -738,6 +743,7 @@ function createCard(card){
 
 function addDrag(el){
 
+    // 桌機拖曳
     el.addEventListener(
     'dragstart',
     e=>{
@@ -760,6 +766,13 @@ function addDrag(el){
             JSON.stringify(data)
         );
     });
+
+    // 手機觸控
+    el.addEventListener(
+    'touchstart',
+    touchStart,
+    {passive:false}
+    );
 }
 
 function moveToTableau(
@@ -1050,6 +1063,125 @@ function checkWin(){
         'winScreen'
         ).style.display='flex';
     }
+}
+
+let touchData = null;
+
+function touchStart(e){
+
+    e.preventDefault();
+
+    const el = e.currentTarget;
+
+    touchData = {
+
+        source: el.dataset.source,
+        col: el.dataset.col,
+        index: el.dataset.index,
+        element: el
+    };
+
+    el.style.zIndex = 9999;
+
+    document.addEventListener(
+        'touchmove',
+        touchMove,
+        {passive:false}
+    );
+
+    document.addEventListener(
+        'touchend',
+        touchEnd
+    );
+}
+
+function touchMove(e){
+
+    if(!touchData) return;
+
+    e.preventDefault();
+
+    const touch = e.touches[0];
+
+    const el = touchData.element;
+
+    el.style.left =
+        `${touch.clientX - 40}px`;
+
+    el.style.top =
+        `${touch.clientY - 60}px`;
+
+    el.style.position = 'fixed';
+
+    el.style.pointerEvents = 'none';
+}
+
+function touchEnd(e){
+
+    if(!touchData) return;
+
+    const touch =
+        e.changedTouches[0];
+
+    const target =
+        document.elementFromPoint(
+            touch.clientX,
+            touch.clientY
+        );
+
+    // foundation
+    const foundation =
+        target?.closest('.foundation');
+
+    if(foundation){
+
+        moveToFoundation(
+            touchData,
+            Number(
+                foundation.dataset.foundation
+            )
+        );
+    }
+
+    // tableau
+    const column =
+        target?.closest('.column');
+
+    if(column){
+
+        const cols = [
+            ...document.querySelectorAll(
+                '.column'
+            )
+        ];
+
+        const index =
+            cols.indexOf(column);
+
+        moveToTableau(
+            touchData,
+            index
+        );
+    }
+
+    touchData.element.style.position='';
+    touchData.element.style.left='';
+    touchData.element.style.top='';
+    touchData.element.style.zIndex='';
+
+    touchData = null;
+
+    document.removeEventListener(
+        'touchmove',
+        touchMove
+    );
+
+    document.removeEventListener(
+        'touchend',
+        touchEnd
+    );
+
+    render();
 }
 
 newGame();
