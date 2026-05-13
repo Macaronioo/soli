@@ -18,6 +18,11 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+html, body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
 body{
     margin:0;
     font-family:
@@ -31,6 +36,9 @@ body{
 
     overflow-x:hidden;
     color:white;
+
+    max-width: 420px;
+    margin: 0 auto;
 }
 
 .topbar{
@@ -107,7 +115,7 @@ button:hover{
     align-items:flex-start;
     overflow-x:auto;
     padding-bottom:20px;
-    min-width:max-content;
+    min-width:0;
 }
 
 .column{
@@ -206,6 +214,11 @@ button:hover{
     animation:pop .4s ease;
 }
 
+.card{
+    user-select:none;
+    -webkit-user-drag:none;
+}
+
 @keyframes pop{
     from{
         transform:scale(.5);
@@ -238,7 +251,13 @@ button:hover{
     .tableau{
         overflow-x:auto;
         padding-bottom:20px;
+        gap: 8px;
     }
+
+    .column {
+        min-width: var(--card-w);
+    }
+
 }
 
 #waste{
@@ -1048,6 +1067,7 @@ function autoComplete(){
     },150);
 }
 
+
 function checkWin(){
 
     const total=
@@ -1073,16 +1093,22 @@ function touchStart(e){
 
     const el = e.currentTarget;
 
-    touchData = {
+    const rect = el.getBoundingClientRect();
 
+    touchData = {
         source: el.dataset.source,
         col: el.dataset.col,
         index: el.dataset.index,
-        element: el
+        element: el,
+
+        offsetX: e.touches[0].clientX - rect.left,
+        offsetY: e.touches[0].clientY - rect.top
     };
 
     el.style.zIndex = 9999;
     el.style.pointerEvents = 'none';
+    el.style.transition = 'none';
+    el.style.willChange = 'transform';
 
     document.addEventListener(
         'touchmove',
@@ -1103,17 +1129,19 @@ function touchMove(e){
     e.preventDefault();
 
     const touch = e.touches[0];
-
     const el = touchData.element;
 
-    el.style.transform =
-    `translate(
-    ${touch.clientX - 40}px,
-    ${touch.clientY - 60}px
-    )`;
+    const x = touch.clientX - touchData.offsetX;
+    const y = touch.clientY - touchData.offsetY;
 
     el.style.position = 'fixed';
+    el.style.left = '0px';
+    el.style.top = '0px';
 
+    el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    el.style.transition = "none";
+
+    el.style.willChange = 'transform';
 }
 
 function touchEnd(e){
@@ -1164,10 +1192,16 @@ function touchEnd(e){
         );
     }
 
-    touchData.element.style.position='';
-    touchData.element.style.transform='';
-    touchData.element.style.zIndex='';
-    touchData.element.style.pointerEvents='';
+    const el = touchData.element;
+
+    el.style.position = '';
+    el.style.transform = '';
+    el.style.left = '';
+    el.style.top = '';
+    el.style.zIndex = '';
+    el.style.pointerEvents = '';
+    el.style.transition = '';
+    el.style.willChange = '';
 
     touchData = null;
 
