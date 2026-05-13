@@ -1110,9 +1110,9 @@ function touchStart(e){
         el.style.pointerEvents = 'none';
         el.style.transition = 'none';
 
-        const rect = el.getBoundingClientRect();
-        el.dataset.startLeft = rect.left;
-        el.dataset.startTop = rect.top;
+        const rect2 = el.getBoundingClientRect();
+        el.dataset.startLeft = rect2.left;
+        el.dataset.startTop = rect2.top;
 
     document.addEventListener(
         'touchmove',
