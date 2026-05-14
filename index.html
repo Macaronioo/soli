@@ -113,7 +113,7 @@ button:hover{
     display:flex;
     gap:8px;
     align-items:flex-start;
-    overflow-x:hidden;
+    overflow-x:auto;
     padding-bottom:20px;
 
     width:100%;
@@ -121,7 +121,7 @@ button:hover{
 
 .column{
     min-height:60vh;
-    width: calc((420px - 20px) / 7);
+    width:var(--card-w);
     flex-shrink:0;
 }
 
@@ -234,9 +234,9 @@ button:hover{
 @media(max-width:700px){
 
     :root{
-        --card-w:64px;
-        --card-h:92px;
-        --gap:6px;
+        --card-w:52px;
+        --card-h:76px;
+        --gap:4px;
     }
 
     .title{
@@ -262,7 +262,7 @@ button:hover{
 }
 
 #waste{
-    width:140px;
+    width:calc(var(--card-w) * 1.8);
 }
 
 </style>
@@ -1135,15 +1135,38 @@ function touchMove(e){
     const touch = e.touches[0];
     const el = touchData.element;
 
-    const x = touch.clientX - touchData.offsetX;
-    const y = touch.clientY - touchData.offsetY;
+    const x =
+        touch.clientX - touchData.offsetX;
 
-    el.style.position = 'fixed';
+    const y =
+        touch.clientY - touchData.offsetY;
+
     el.style.left = '0px';
     el.style.top = '0px';
+    el.style.position = 'fixed';
 
     el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
     el.style.willChange = 'transform';
+
+    if(touchData.source === 'tableau'){
+
+        const cards =
+        [...document.querySelectorAll('.card')]
+        .filter(c=>
+
+            c.dataset.col ==
+            touchData.col &&
+
+            Number(c.dataset.index) >
+            Number(touchData.index)
+        );
+
+        cards.forEach(card=>{
+
+            card.style.transform =
+            `translate3d(${x}px, ${y}px, 0)`;
+        });
+    }
 }
 
 function touchEnd(e){
@@ -1161,7 +1184,7 @@ function touchEnd(e){
 
     // foundation
     const foundation =
-    target && target.closest('.foundation');
+        target && target.closest('.foundation');
 
     if(foundation){
 
@@ -1175,7 +1198,7 @@ function touchEnd(e){
 
     // tableau
     const column =
-    target && target.closest('.column');
+        target && target.closest('.column');
 
     if(column){
 
@@ -1198,12 +1221,18 @@ function touchEnd(e){
 
     el.style.position = '';
     el.style.transform = '';
-    el.style.left = '';
     el.style.top = '';
     el.style.zIndex = '';
     el.style.pointerEvents = '';
     el.style.transition = '';
     el.style.willChange = '';
+
+    document
+    .querySelectorAll('.card')
+    .forEach(card=>{
+
+        card.style.transform='';
+    });    
 
     touchData = null;
 
