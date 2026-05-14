@@ -78,22 +78,18 @@ button:hover{
     padding:10px;
 }
 
-.game-scale{
-    width:100vw;
-    overflow:auto;
-
-    display:flex;
-    justify-content:center;
-}
-
-.game{
-    transform-origin:top center;
-}
-
 .top{
     display:flex;
     justify-content:space-between;
     margin-bottom:18px;
+
+    position:relative;
+    z-index:1000;
+}
+
+.tableau{
+    position:relative;
+    z-index:1;
 }
 
 .left-top,
@@ -151,9 +147,8 @@ button:hover{
     justify-content:space-between;
 
     transition:
-    transform .18s,
-    left .18s,
-    top .18s;
+    left .12s,
+    top .12s;
 
     touch-action:none;
 }
@@ -187,7 +182,7 @@ button:hover{
 }
 
 .center{
-    font-size:30px;
+    font-size:22px;
     align-self:center;
 }
 
@@ -244,14 +239,18 @@ button:hover{
 
 @media(hover:none){
 
-    .game{
-        transform:scale(0.78);
+    :root{
+        --card-w:56px;
+        --card-h:82px;
+        --gap:4px;
     }
 
-    :root{
-        --card-w:52px;
-        --card-h:76px;
-        --gap:4px;
+    .center{
+        font-size:16px;
+    }
+
+    .card{
+        font-size:12px;
     }
 
     .card:hover{
@@ -268,6 +267,7 @@ button:hover{
         gap:12px;
     }
 
+
     .tableau{
         overflow-x:auto;
         padding-bottom:20px;
@@ -277,9 +277,6 @@ button:hover{
     .column {
         min-width: var(--card-w);
     }
-    .game{
-        transform:scale(0.78);
-    }
 
     .card:hover{
         transform:none;
@@ -288,6 +285,12 @@ button:hover{
 
 #waste{
     width:calc(var(--card-w) * 1.8);
+    z-index:5000;
+}
+
+.left-top{
+    position:relative;
+    z-index:5000;
 }
 
 </style>
@@ -319,7 +322,6 @@ button:hover{
 
 </div>
 
-<div class="game-scale">
 <div class="game">
 
     <div class="top">
@@ -344,7 +346,6 @@ button:hover{
 
     <div class="tableau" id="tableau"></div>
 
-</div>
 </div>
 
 <div class="win" id="winScreen">
@@ -587,13 +588,11 @@ function renderWaste(){
 
         c.dataset.source='waste';
 
-        c.style.left = '0px';
+        c.style.left =
+        `${index * 18}px`;
 
         c.style.zIndex =
         index + 1;
-
-        c.style.transform =
-        `translateX(${index * 22}px)`;
 
         if(index === visible.length-1){
 
@@ -1139,10 +1138,7 @@ function touchStart(e){
         el.style.zIndex = 999999;
         el.style.pointerEvents = 'none';
         el.style.transition = 'none';
-
-        const rect2 = el.getBoundingClientRect();
-        el.dataset.startLeft = rect2.left;
-        el.dataset.startTop = rect2.top;
+        el.style.margin = '0';
 
     document.addEventListener(
         'touchmove',
@@ -1166,37 +1162,17 @@ function touchMove(e){
     const el = touchData.element;
 
     const x =
-        touch.clientX - touchData.offsetX;
+        touch.clientX -
+        touchData.offsetX -
+        window.scrollX;
 
     const y =
-        touch.clientY - touchData.offsetY;
+        touch.clientY -
+        touchData.offsetY -
+        window.scrollY;
 
-    el.style.left = '0px';
-    el.style.top = '0px';
-    el.style.position = 'fixed';
-
-    el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-    el.style.willChange = 'transform';
-
-    if(touchData.source === 'tableau'){
-
-        const cards =
-        [...document.querySelectorAll('.card')]
-        .filter(c=>
-
-            c.dataset.col ==
-            touchData.col &&
-
-            Number(c.dataset.index) >
-            Number(touchData.index)
-        );
-
-        cards.forEach(card=>{
-
-            card.style.transform =
-            `translate3d(${x}px, ${y}px, 0)`;
-        });
-    }
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
 }
 
 function touchEnd(e){
@@ -1206,11 +1182,18 @@ function touchEnd(e){
     const touch =
         e.changedTouches[0];
 
+    const el =
+        touchData.element;
+
+    el.style.display = 'none';
+
     const target =
         document.elementFromPoint(
             touch.clientX,
             touch.clientY
         );
+
+    el.style.display = '';
 
     // foundation
     const foundation =
@@ -1247,22 +1230,12 @@ function touchEnd(e){
         );
     }
 
-    const el = touchData.element;
-
     el.style.position = '';
     el.style.transform = '';
+    el.style.left = '';
     el.style.top = '';
     el.style.zIndex = '';
     el.style.pointerEvents = '';
-    el.style.transition = '';
-    el.style.willChange = '';
-
-    document
-    .querySelectorAll('.card')
-    .forEach(card=>{
-
-        card.style.transform='';
-    });    
 
     touchData = null;
 
