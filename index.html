@@ -25,6 +25,7 @@ html, body {
 
 body{
     margin:0;
+
     font-family:
     -apple-system,
     BlinkMacSystemFont,
@@ -34,11 +35,8 @@ body{
     background:
     radial-gradient(circle at top,#0f9b4f,#065f2f 60%);
 
-    overflow-x:hidden;
+    overflow:hidden;
     color:white;
-
-    max-width: 420px;
-    margin: 0 auto;
 }
 
 .topbar{
@@ -78,6 +76,18 @@ button:hover{
 
 .game{
     padding:10px;
+}
+
+.game-scale{
+    width:100vw;
+    overflow:auto;
+
+    display:flex;
+    justify-content:center;
+}
+
+.game{
+    transform-origin:top center;
 }
 
 .top{
@@ -218,6 +228,7 @@ button:hover{
 .card{
     user-select:none;
     -webkit-user-drag:none;
+    z-index:1;
 }
 
 @keyframes pop{
@@ -231,12 +242,20 @@ button:hover{
     }
 }
 
-@media(max-width:700px){
+@media(hover:none){
+
+    .game{
+        transform:scale(0.78);
+    }
 
     :root{
         --card-w:52px;
         --card-h:76px;
         --gap:4px;
+    }
+
+    .card:hover{
+        transform:none;
     }
 
     .title{
@@ -258,7 +277,13 @@ button:hover{
     .column {
         min-width: var(--card-w);
     }
+    .game{
+        transform:scale(0.78);
+    }
 
+    .card:hover{
+        transform:none;
+    }
 }
 
 #waste{
@@ -294,6 +319,7 @@ button:hover{
 
 </div>
 
+<div class="game-scale">
 <div class="game">
 
     <div class="top">
@@ -318,6 +344,7 @@ button:hover{
 
     <div class="tableau" id="tableau"></div>
 
+</div>
 </div>
 
 <div class="win" id="winScreen">
@@ -560,11 +587,13 @@ function renderWaste(){
 
         c.dataset.source='waste';
 
-        c.style.left =
-        `${index * 22}px`;
+        c.style.left = '0px';
 
         c.style.zIndex =
         index + 1;
+
+        c.style.transform =
+        `translateX(${index * 22}px)`;
 
         if(index === visible.length-1){
 
@@ -1106,7 +1135,8 @@ function touchStart(e){
         offsetY: e.touches[0].clientY - rect.top
     };
 
-        el.style.zIndex = 9999;
+        el.style.position = 'fixed';
+        el.style.zIndex = 999999;
         el.style.pointerEvents = 'none';
         el.style.transition = 'none';
 
